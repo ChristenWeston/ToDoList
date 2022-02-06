@@ -33,10 +33,23 @@ namespace ListMaker
         }
         else if (viewOrAddToList == "View")
         {
-          List<Item> result = Item.GetAll();
-          Console.WriteLine(result);
-          Console.WriteLine("Did you view your list?");
-          Console.WriteLine("Do you want to leave the do do list? ('Y' for yes");
+          Item.GetAll();
+          List<Item> toDoListItems = Item.GetAll();
+
+          if (toDoListItems.Count == 0)
+          {
+            Console.WriteLine("Your to do list is empty!");
+          }
+
+          else
+          {
+            for (int i = 0; i < toDoListItems.Count; i++)
+            {
+              Console.WriteLine(toDoListItems[i].Description + ", ");
+            }
+          }
+
+          Console.WriteLine("Do you want to leave the do do list? ('Y' for yes or enter for No)");
           string leaveOrStay = Console.ReadLine();
           if (leaveOrStay == "Y" || leaveOrStay == "y")
           {
