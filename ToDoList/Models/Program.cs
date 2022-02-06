@@ -6,7 +6,6 @@ namespace ListMaker
 {
   public class Program
   {
-    
      public static void Main()
      {
        Console.WriteLine("Welcome to the To Do List Main Menu!");
@@ -20,8 +19,9 @@ namespace ListMaker
           string newItemDescription = Console.ReadLine();
           Item newItem1 = new Item(newItemDescription);
           Console.WriteLine(newItemDescription + " was added to the list!");
-          Console.WriteLine("Do you want to leave the to do list? ('Y' for yes)");
+          Console.WriteLine("Do you want to leave the to do list? ('Y' for yes or enter for no)");
           string leaveOrStay = Console.ReadLine();
+
           if (leaveOrStay == "Y" || leaveOrStay == "y")
           {
             Console.WriteLine("Ok bye bye!");
@@ -31,6 +31,7 @@ namespace ListMaker
             Main();
           }
         }
+
         else if (viewOrAddToList == "View")
         {
           Item.GetAll();
@@ -51,6 +52,7 @@ namespace ListMaker
 
           Console.WriteLine("Do you want to leave the do do list? ('Y' for yes or enter for No)");
           string leaveOrStay = Console.ReadLine();
+
           if (leaveOrStay == "Y" || leaveOrStay == "y")
           {
             Console.WriteLine("Ok bye bye!");
