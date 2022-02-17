@@ -1,4 +1,3 @@
-
 @using ToDoList.Models;
 
 <h1>To Do List</h1>
@@ -9,9 +8,10 @@
 <ul>
   @foreach (Item item in Model)
   {
-  <li>@item.Description</li>
+    <li><a href='/items/@item.Id'>@item.Description</a></li>
   }
 </ul>
+
 <a href="/items/new">Add a new item.</a>
 
 <form action="/items/delete" method="post">
