@@ -4,8 +4,10 @@ using ToDoList.Models;
 
 namespace ToDoList.Controllers
 {
+
   public class ItemsController : Controller
   {
+
     //Get request
     [HttpGet("/items")]
     public ActionResult Index()
@@ -21,8 +23,10 @@ namespace ToDoList.Controllers
     }
     //Post request
     [HttpPost("/items")]
+
     public ActionResult Create(string description)
     {
+
       Item myItem = new Item(description);
       // The first argument specifies the view that should be returned. This is new functionality we haven't covered before. 
       // In this case, we tell the View() method to return the "Index" view.
