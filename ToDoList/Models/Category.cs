@@ -14,7 +14,7 @@ namespace ToDoList.Models
       Name = categoryName;
       _instances.Add(this);
       Id = _instances.Count;
-      Items = new List<Item>{};
+      Items = new List<Item>{}; // This is where the Items related to the parent category will be stored
     }
 
     public static void ClearAll()
@@ -30,6 +30,11 @@ namespace ToDoList.Models
     public static Category Find(int searchId)
     {
       return _instances[searchId-1];
+    }
+
+    public void AddItem(Item item)
+    {
+      Items.Add(item);
     }
 
   }
