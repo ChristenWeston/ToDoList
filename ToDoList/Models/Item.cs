@@ -6,7 +6,7 @@ namespace ToDoList.Models
   {
 
     public string Description { get; set; }
-    public int Id { get; }
+    public int Id { get; set; }
 
 
     public Item(string description)
@@ -19,6 +19,22 @@ namespace ToDoList.Models
         Description = description;
         Id = id;
     }
+
+    public override bool Equals(System.Object otherItem)
+    {
+      if (!(otherItem is Item))
+      {
+        return false;
+      }
+      else
+      {
+      Item newItem = (Item) otherItem;
+      bool idEquality = (this.Id == newItem.Id);
+      bool descriptionEquality = (this.Description == newItem.Description);
+      return (idEquality && descriptionEquality);
+      }
+    }
+
 
 //Variables and methods dealing with entire classes must be static
     public static List<Item> GetAll()
@@ -63,6 +79,29 @@ namespace ToDoList.Models
     // Temporarily returning placeholder item to get beyond compiler errors until we refactor to work with database.
     Item placeholderItem = new Item("placeholder item");
     return placeholderItem;
+    }
+
+    public void Save()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+
+      // Begin new code
+
+      cmd.CommandText = "INSERT INTO items (description) VALUES (@ItemDescription);";
+      MySqlParameter param = new MySqlParameter();
+      param.ParameterName = "@ItemDescription";
+      param.Value = this.Description;
+      cmd.Parameters.Add(param);    
+      cmd.ExecuteNonQuery();
+      Id = (int) cmd.LastInsertedId;
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
     }
   }
 }
