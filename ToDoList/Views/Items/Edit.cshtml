@@ -15,6 +15,10 @@
     @Html.LabelFor(model => model.Description)
     @Html.EditorFor(model => model.Description)
 
+    @Html.LabelFor(model => model.Category)
+    //HTML helper method DropDownList passing in the name of a ViewBag property of the type SelectList
+    @Html.DropDownList("CategoryId")
+
     <input type="submit" value="Save" />
 }
 <p>@Html.ActionLink("Back to list", "Index")</p>
