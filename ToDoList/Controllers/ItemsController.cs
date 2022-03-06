@@ -17,7 +17,8 @@ namespace ToDoList.Controllers
 
     public ActionResult Index()
     {
-      List<Item> model = _db.Items.ToList();
+      //for each Item in the database, include the Category it belongs to and then put all the Items into a list
+      List<Item> model = _db.Items.Include(item => item.Category).ToList();
       return View(model);
     }
 
