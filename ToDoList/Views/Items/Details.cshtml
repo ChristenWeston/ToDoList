@@ -6,7 +6,46 @@
 
 <h2>Item Details</h2>
 <hr />
-<h3>@Html.DisplayNameFor(model => model.Description): @Html.DisplayFor(model => model.Description)<h3>
+<h3>@Html.DisplayNameFor(model => model.Description): @Html.DisplayFor(model => model.Description)</h3>
+
+@if(@Model.JoinEntities.Count == 0)
+{
+  <p>This item does not belong to any categories</p>
+}
+else
+{
+  <h4>Categories the item belongs to:</h4>
+  <ul>
+  @foreach(var join in Model.JoinEntities)
+  {
+    <li>@join.Category.Name</li>
+  }
+  </ul>
+}
+
+//We add the form to the foreach loop block so that we can create a separate delete button for each category. 
+//We pass in two arguments to our BeginForm method. The first argument is the route method that we'd like 
+//to invoke and the second argument is the controller Note that .NET appends "Controller" to whatever string 
+//you pass in.
+
+//We also pass through a Hidden method with two arguments. The first argument is the name of the route parameter
+// variable we'd like to pass and the second is the actual value of that parameter. In this case, since we want to
+// delete the CategoryItem entry, we'll pass through the CategoryItemId that we have access to as a variable called
+// joinId.
+
+  <ul>
+  @foreach(var join in Model.JoinEntities)
+  {
+    <li>@join.Category.Name</li>
+    @using (Html.BeginForm("DeleteCategory", "Items"))
+    {
+      @Html.Hidden("joinId", @join.CategoryItemId)
+      <input type="submit" value="Delete"/>
+    }
+  }
+  </ul>
+
 <p>@Html.ActionLink("Back to list", "Index")</p>
 <p>@Html.ActionLink("Edit Item", "Edit", new { id = Model.ItemId })</p>
 <p>@Html.ActionLink("Delete Item", "Delete", new { id = Model.ItemId })</p>
+<p>@Html.ActionLink("Add a Category", "AddCategory", new { id = Model.ItemId })</p>

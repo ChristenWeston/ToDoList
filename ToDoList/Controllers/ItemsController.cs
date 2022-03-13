@@ -18,10 +18,7 @@ namespace ToDoList.Controllers
 
     public ActionResult Index()
     {
-      //for each Item in the database, include the Category it belongs to and then put all the Items into a list
-      List<Item> model = _db.Items.Include(item => item.Category).ToList();
-      ViewBag.PageTitle = "View All Items";
-      return View(model);
+        return View(_db.Items.ToList());
     }
 
     public ActionResult Create()
@@ -35,16 +32,27 @@ namespace ToDoList.Controllers
     }
 
     [HttpPost]
-    public ActionResult Create(Item item)
+    public ActionResult Create(Item item, int CategoryId)
     {
-        _db.Items.Add(item);
-        _db.SaveChanges();
+        _db.Items.Add(item); //Adds item to database
+        _db.SaveChanges(); //save or else local item will not have an id to enter into the join
+        if (CategoryId != 0)
+        {
+          //The line of code inside the if block creates the association between the newly created Item and a Category. 
+          //Because the Item has been added and a new ItemId has been assigned, we can create a new CategoryItem join entity. This 
+          //combines the ItemId with the CategoryId specified in the dropdown menu and passed in through our route's parameters.
+            _db.CategoryItem.Add(new CategoryItem() { CategoryId = CategoryId, ItemId = item.ItemId });
+            _db.SaveChanges();
+        }
         return RedirectToAction("Index");
     }
     public ActionResult Details(int id)
     {
-      Item thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
-      return View(thisItem);
+        var thisItem = _db.Items
+            .Include(item => item.JoinEntities)
+            .ThenInclude(join => join.Category)
+            .FirstOrDefault(item => item.ItemId == id); // This specifies which item from the database were working with
+        return View(thisItem);
     }
 
     public ActionResult Edit(int id)
@@ -56,12 +64,39 @@ namespace ToDoList.Controllers
     }
 
     [HttpPost]
-    public ActionResult Edit(Item item)
+    public ActionResult Edit(Item item, int CategoryId)
     {
+      if (CategoryId != 0)
+      {
+        _db.CategoryItem.Add(new CategoryItem() { CategoryId = CategoryId, ItemId = item.ItemId });
+      }
       _db.Entry(item).State = EntityState.Modified;
       _db.SaveChanges();
       return RedirectToAction("Index");
     }
+
+    public ActionResult AddCategory(int id)
+    {
+      var thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
+      ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
+      return View(thisItem);
+    }
+
+    [HttpPost]
+    public ActionResult AddCategory(Item item, int CategoryId)
+    {
+      if (CategoryId != 0)
+      {
+        _db.CategoryItem.Add(new CategoryItem() { CategoryId = CategoryId, ItemId = item.ItemId });
+        _db.SaveChanges();
+      }
+    return RedirectToAction("Index");
+    }
+    //It may seem redundant to have a separate page where we add a categories because we already have the ability to 
+    //add a category in our edit view. However, in that case, we had only established a one-to-many relationship as 
+    //we never gave the user the ability to add more than one category to an item at a time, only the ability to edit 
+    //an item's category. 
+    //By adding a separate route to add categories, we give the user the option of adding many categories to an item.
 
     public ActionResult Delete(int id)
     {
@@ -74,6 +109,19 @@ namespace ToDoList.Controllers
     {
       var thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
       _db.Items.Remove(thisItem);
+      _db.SaveChanges();
+      return RedirectToAction("Index");
+    }
+
+//This route will find the entry in the join table by using the join entry's CategoryItemId. The CategoryItemId is
+// being passed in through the variable joinId in our route's parameter and came from the BeginForm() HTML helper
+// method in our details view.
+
+    [HttpPost]
+    public ActionResult DeleteCategory(int joinId)
+    {
+      var joinEntry = _db.CategoryItem.FirstOrDefault(entry => entry.CategoryItemId == joinId);
+      _db.CategoryItem.Remove(joinEntry);
       _db.SaveChanges();
       return RedirectToAction("Index");
     }

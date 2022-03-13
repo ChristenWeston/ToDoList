@@ -33,10 +33,14 @@ namespace ToDoList.Controllers
         _db.SaveChanges();
         return RedirectToAction("Index");
     }
+
     public ActionResult Details(int id)
     {
-      Category thisCategory = _db.Categories.FirstOrDefault(category => category.CategoryId == id);
-      return View(thisCategory);
+    var thisCategory = _db.Categories
+        .Include(category => category.JoinEntities)
+        .ThenInclude(join => join.Item)
+        .FirstOrDefault(category => category.CategoryId == id);
+    return View(thisCategory);
     }
 
     public ActionResult Edit(int id)
