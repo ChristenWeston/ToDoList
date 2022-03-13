@@ -3,7 +3,7 @@ div#footer {
   bottom:0px;
   left:0px;
   width:100%;
-  color:#CCC;
-  background:#333;
+  color:rgb(24, 6, 90);
+  background:rgb(170, 21, 21);
   padding:8px;
 }
