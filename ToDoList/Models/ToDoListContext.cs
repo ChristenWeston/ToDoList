@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ToDoList.Models
 {
-  public class ToDoListContext : DbContext
+  //declaring that ApplicationUser is the type of IdentityDbContext we are inheriting
+  public class ToDoListContext : IdentityDbContext<ApplicationUser>
   {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Item> Items { get; set; }
