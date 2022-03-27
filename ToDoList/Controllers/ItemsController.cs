@@ -22,10 +22,24 @@ namespace ToDoList.Controllers
       _userManager = userManager;
       _db = db;
     }
-
-    public ActionResult Index()
+    // Async. Will return a task containing an action result. Then, locate unique identifier for the currently-logged-in user and assign it the variable name userId
+    public async Task<ActionResult> Index()
     {
-        return View(_db.Items.ToList());
+      //this refers to the ItemController itself. FindFirst() method locates the first record that meets the provided criteria.
+      //Method takes ClaimTypes.NameIdentifier as argument. This is why we need a using directive for System.Security.Claims
+      //We specify ClaimTypes.NameIdentifier to locate the unique ID associated w/ the current account.
+      //Name Identifier is a property that refers to an Entity's unique ID
+      //Include the ? (existential operator). This states we should only call the property to right of the ? if the method to the left of the ? doesn't return null
+      //In other words, if we successfully locate the NameIdentifier of the current user, we will call Value to retrieve the actual unique identifier value
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      //Call UserManager service first that we've injected into this controller
+      // Call FindByIdAsync() method to find a users account by their unique id
+      //Provide the UserId we just located as an argument to FindByIdAsync
+      //This runs asynchronously. We include await so the code will wait for Idnetity to loacet the correct user before moving on
+      //Create a variable to store a collection containing only the Items that are associated w/ the currently logged in users unique ID property
+      var currentUser = await _userManager.FindByIdAsync(userId);
+      var userItems = _db.Items.Where(entry => entry.User.Id == currentUser.Id).ToList();
+      return View(userItems);
     }
 
     public ActionResult Create()
@@ -39,20 +53,21 @@ namespace ToDoList.Controllers
     }
 
     [HttpPost]
-    public ActionResult Create(Item item, int CategoryId)
+    public async Task<ActionResult> Create(Item item, int CategoryId)
     {
-        _db.Items.Add(item); //Adds item to database
-        _db.SaveChanges(); //save or else local item will not have an id to enter into the join
-        if (CategoryId != 0)
-        {
-          //The line of code inside the if block creates the association between the newly created Item and a Category. 
-          //Because the Item has been added and a new ItemId has been assigned, we can create a new CategoryItem join entity. This 
-          //combines the ItemId with the CategoryId specified in the dropdown menu and passed in through our route's parameters.
-            _db.CategoryItem.Add(new CategoryItem() { CategoryId = CategoryId, ItemId = item.ItemId });
-            _db.SaveChanges();
-        }
-        return RedirectToAction("Index");
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      var currentUser = await _userManager.FindByIdAsync(userId);
+      item.User = currentUser;
+      _db.Items.Add(item);
+      _db.SaveChanges();
+      if (CategoryId != 0)
+      {
+          _db.CategoryItem.Add(new CategoryItem() { CategoryId = CategoryId, ItemId = item.ItemId });
+      }
+      _db.SaveChanges();
+      return RedirectToAction("Index");
     }
+
     public ActionResult Details(int id)
     {
         var thisItem = _db.Items
