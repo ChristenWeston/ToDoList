@@ -3,18 +3,25 @@
 }
 
 @using ToDoList.Models;
-@model List<ToDoList.Models.Item>;
+@model IEnumerable<ToDoList.Models.Item>
 
-<h1>Items</h1>
+<h1>Items for @User.Identity.Name</h1>
 
-@if (@Model.Count == 0)
+<!-- If model includes any Items this will return false and we will loop through our list. Otherwise the statement will return false and will display the No Items Added mesage -->
+@if (Model.Any())
+{
+  <ul>
+    @foreach (Item item in Model)
+    {
+      <li>@Html.ActionLink($"{item.Description}", "Details", new { id = item.ItemId })</li>
+    }
+  </ul>
+} 
+else
 {
   <h3>No items have been added yet!</h3>
-} 
-
-@foreach (Item item in Model)
-{
-  <li>@Html.ActionLink($"{item.Description}", "Details", new { id = item.ItemId })</li>
 }
 
 <p>@Html.ActionLink("Add new item", "Create")</p>
+
+<p>@Html.ActionLink("Home", "Index", "Home")</p>
