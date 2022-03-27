@@ -15,15 +15,6 @@
 else
 {
   <h4>Categories the item belongs to:</h4>
-  <ul>
-  @foreach(var join in Model.JoinEntities)
-  {
-    <li>@join.Category.Name</li>
-  }
-  </ul>
-}
-
-
 
   <ul>
   @foreach(var join in Model.JoinEntities)
@@ -32,10 +23,11 @@ else
     @using (Html.BeginForm("DeleteCategory", "Items"))
     {
       @Html.Hidden("joinId", @join.CategoryItemId)
-      <input type="submit" value="Delete"/>
+      <input type="submit" value="Delete"class="btn btn-info btn-sm"/>
     }
   }
   </ul>
+}
 //We add the form to the foreach loop block so that we can create a separate delete button for each category. 
 //We pass in two arguments to our BeginForm method. The first argument is the route method that we'd like 
 //to invoke and the second argument is the controller Note that .NET appends "Controller" to whatever string 
